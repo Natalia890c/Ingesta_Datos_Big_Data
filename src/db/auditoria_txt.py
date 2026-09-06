@@ -161,4 +161,4 @@ FIN DE LA AUDITORÍA
 
 
 if __name__ == "__main__":
-    generar_a
+    generar_auditoria() 
