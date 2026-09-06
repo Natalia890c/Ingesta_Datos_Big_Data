@@ -8,10 +8,7 @@ from datetime import datetime
 import pandas as pd
 
 
-# ==========================================
 # CONFIGURACIÓN
-# ==========================================
-
 URL = "https://www.kaggle.com/api/v1/datasets/download/vijayuv/onlineretail"
 
 DATA_DIR = "data"
@@ -19,10 +16,7 @@ CSV_PATH = os.path.join(DATA_DIR, "OnlineRetail.csv")
 AUDIT_PATH = os.path.join(DATA_DIR, "auditoria_extraccion.json")
 
 
-# ==========================================
 # DESCARGA DESDE KAGGLE
-# ==========================================
-
 def descargar_dataset():
 
     os.makedirs(DATA_DIR, exist_ok=True)
@@ -59,10 +53,7 @@ def descargar_dataset():
     return df, csv_file
 
 
-# ==========================================
 # CARGAR DATASET LOCAL
-# ==========================================
-
 def cargar_dataset():
 
     if os.path.exists(CSV_PATH):
@@ -77,10 +68,7 @@ def cargar_dataset():
     return descargar_dataset()
 
 
-# ==========================================
 # AUDITORÍA
-# ==========================================
-
 def generar_auditoria(df, archivo, descargado):
 
     auditoria = {
@@ -103,9 +91,7 @@ def generar_auditoria(df, archivo, descargado):
     print(f"\nAuditoría guardada en: {AUDIT_PATH}")
 
 
-# ==========================================
 # PROCESO PRINCIPAL
-# ==========================================
 
 if __name__ == "__main__":
 

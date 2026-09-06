@@ -29,13 +29,7 @@ def ejecutar_auditoria():
 
     conexion = sqlite3.connect(DB_PATH)
 
-    print("========================================")
-    print("      AUDITORÍA FINAL DEL PROYECTO")
-    print("========================================")
-
-    # -----------------------------------------
-    # Conteos principales
-    # -----------------------------------------
+    print("    AUDITORÍA FINAL DEL PROYECTO")
 
     conteos = {}
 
@@ -56,10 +50,7 @@ def ejecutar_auditoria():
 
         conteos[tabla] = total
 
-    # -----------------------------------------
     # Registros descartados
-    # -----------------------------------------
-
     registros_originales = conteos["stg_online_retail"]
     registros_validos = conteos["ventas_limpias"]
 
@@ -67,10 +58,6 @@ def ejecutar_auditoria():
         registros_originales -
         registros_validos
     )
-
-    # -----------------------------------------
-    # Ventas sin cliente
-    # -----------------------------------------
 
     ventas_sin_cliente = conexion.execute(
         """
@@ -85,10 +72,7 @@ def ejecutar_auditoria():
         ventas_sin_cliente
     )
 
-    # -----------------------------------------
-    # Integridad referencial
-    # -----------------------------------------
-
+    
     fecha_invalidas = conexion.execute(
         """
         SELECT COUNT(*)
@@ -120,10 +104,7 @@ def ejecutar_auditoria():
         """
     ).fetchone()[0]
 
-    # -----------------------------------------
     # Reglas de calidad
-    # -----------------------------------------
-
     cantidades_invalidas = conexion.execute(
         """
         SELECT COUNT(*)
@@ -158,10 +139,7 @@ def ejecutar_auditoria():
         """
     ).fetchone()[0]
 
-    # -----------------------------------------
     # Métricas
-    # -----------------------------------------
-
     total_ventas = conexion.execute(
         """
         SELECT SUM(TotalVenta)
@@ -176,10 +154,7 @@ def ejecutar_auditoria():
         """
     ).fetchone()[0]
 
-    # -----------------------------------------
     # Índices
-    # -----------------------------------------
-
     indices = conexion.execute(
         """
         SELECT name
@@ -195,10 +170,7 @@ def ejecutar_auditoria():
         for indice in indices
     ]
 
-    # -----------------------------------------
     # Estado final
-    # -----------------------------------------
-
     errores = (
         fecha_invalidas +
         producto_invalidos +
@@ -258,10 +230,7 @@ def ejecutar_auditoria():
         "indices": indices
     }
 
-    # -----------------------------------------
-    # Guardar auditoría
-    # -----------------------------------------
-
+    # Auditoría
     with open(
         AUDIT_PATH,
         "w",
@@ -277,10 +246,7 @@ def ejecutar_auditoria():
 
     conexion.close()
 
-    # -----------------------------------------
-    # Mostrar resumen
-    # -----------------------------------------
-
+    # Mostra de resumen
     print("\n--- REGISTROS ---")
     print("Originales:", registros_originales)
     print("Válidos:", registros_validos)

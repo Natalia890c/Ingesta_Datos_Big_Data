@@ -5,9 +5,7 @@ import json
 from datetime import datetime
 
 
-# ==========================================
 # CONFIGURACIÓN
-# ==========================================
 
 DATA_DIR = "data"
 CSV_PATH = os.path.join(DATA_DIR, "OnlineRetail.csv")
@@ -15,9 +13,7 @@ DB_PATH = os.path.join(DATA_DIR, "retail.db")
 AUDIT_PATH = os.path.join(DATA_DIR, "auditoria_carga.json")
 
 
-# ==========================================
 # CONEXIÓN
-# ==========================================
 
 def conectar():
 
@@ -26,9 +22,7 @@ def conectar():
     return sqlite3.connect(DB_PATH)
 
 
-# ==========================================
-# CARGAR DATOS EN SQLITE
-# ==========================================
+# CARGA DE DATOS EN SQLITE
 
 def cargar_datos():
 
@@ -74,9 +68,7 @@ def cargar_datos():
     return registros_origen, registros_sqlite, diferencia
 
 
-# ==========================================
 # AUDITORÍA
-# ==========================================
 
 def generar_auditoria(
     registros_origen,
@@ -119,9 +111,6 @@ def generar_auditoria(
     )
 
 
-# ==========================================
-# PROCESO PRINCIPAL
-# ==========================================
 
 if __name__ == "__main__":
 

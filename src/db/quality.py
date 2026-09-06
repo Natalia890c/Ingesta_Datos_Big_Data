@@ -4,18 +4,12 @@ import json
 from datetime import datetime
 
 
-# ==========================================
 # CONFIGURACIÓN
-# ==========================================
-
 DB_PATH = os.path.join("data", "retail.db")
 AUDIT_PATH = os.path.join("data", "auditoria_calidad.json")
 
 
-# ==========================================
 # AUDITORÍA DE CALIDAD
-# ==========================================
-
 def auditar_calidad():
 
     conexion = sqlite3.connect(DB_PATH)
@@ -27,10 +21,7 @@ def auditar_calidad():
         )
     }
 
-    # --------------------------------------
     # Total de registros
-    # --------------------------------------
-
     cursor.execute("""
         SELECT COUNT(*)
         FROM stg_online_retail
@@ -40,10 +31,7 @@ def auditar_calidad():
 
     auditoria["total_registros"] = total
 
-    # --------------------------------------
     # Registros con CustomerID nulo
-    # --------------------------------------
-
     cursor.execute("""
         SELECT COUNT(*)
         FROM stg_online_retail
@@ -52,10 +40,7 @@ def auditar_calidad():
 
     auditoria["customer_id_nulos"] = cursor.fetchone()[0]
 
-    # --------------------------------------
     # Registros con Description nula
-    # --------------------------------------
-
     cursor.execute("""
         SELECT COUNT(*)
         FROM stg_online_retail
@@ -64,10 +49,7 @@ def auditar_calidad():
 
     auditoria["description_nulos"] = cursor.fetchone()[0]
 
-    # --------------------------------------
     # Cantidades <= 0
-    # --------------------------------------
-
     cursor.execute("""
         SELECT COUNT(*)
         FROM stg_online_retail
@@ -76,10 +58,7 @@ def auditar_calidad():
 
     auditoria["cantidad_no_positiva"] = cursor.fetchone()[0]
 
-    # --------------------------------------
     # Precios <= 0
-    # --------------------------------------
-
     cursor.execute("""
         SELECT COUNT(*)
         FROM stg_online_retail
@@ -88,10 +67,7 @@ def auditar_calidad():
 
     auditoria["precio_no_positivo"] = cursor.fetchone()[0]
 
-    # --------------------------------------
     # Facturas canceladas
-    # --------------------------------------
-
     cursor.execute("""
         SELECT COUNT(*)
         FROM stg_online_retail
@@ -100,10 +76,7 @@ def auditar_calidad():
 
     auditoria["facturas_canceladas"] = cursor.fetchone()[0]
 
-    # --------------------------------------
     # Registros duplicados
-    # --------------------------------------
-
     cursor.execute("""
         SELECT COUNT(*)
         FROM (
@@ -135,10 +108,7 @@ def auditar_calidad():
 
     conexion.close()
 
-    # ======================================
-    # GUARDAR AUDITORÍA
-    # ======================================
-
+    # AUDITORÍA
     with open(
         AUDIT_PATH,
         "w",
@@ -152,9 +122,7 @@ def auditar_calidad():
             ensure_ascii=False
         )
 
-    # ======================================
-    # MOSTRAR RESULTADOS
-    # ======================================
+    # RESULTADOS
 
     print("\n--- AUDITORÍA DE CALIDAD ---")
 
@@ -166,9 +134,7 @@ def auditar_calidad():
     )
 
 
-# ==========================================
 # EJECUCIÓN
-# ==========================================
 
 if __name__ == "__main__":
     auditar_calidad()

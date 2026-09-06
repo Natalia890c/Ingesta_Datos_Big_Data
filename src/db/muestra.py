@@ -10,9 +10,7 @@ OUTPUT_PATH = BASE_DIR / "data" / "muestra_ingestion.csv"
 
 
 def generar_muestra():
-    print("========================================")
-    print("     GENERACIÓN DE MUESTRA CON PANDAS")
-    print("========================================")
+    print("   GENERACIÓN DE MUESTRA CON PANDAS")
 
     print(f"\nBase de datos: {DB_PATH}")
 

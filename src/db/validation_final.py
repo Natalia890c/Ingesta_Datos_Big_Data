@@ -21,14 +21,9 @@ def validar_modelo():
 
     conexion = sqlite3.connect(DB_PATH)
 
-    print("========================================")
-    print(" VALIDACIÓN FINAL DEL MODELO ESTRELLA")
-    print("========================================")
+    print("VALIDACIÓN FINAL DEL MODELO ESTRELLA")
 
-    # -----------------------------------------
     # 1. Conteo de tablas
-    # -----------------------------------------
-
     tablas = [
         "stg_online_retail",
         "ventas_limpias",
@@ -62,10 +57,7 @@ def validar_modelo():
         else:
             print(f"{tabla}: NO EXISTE")
 
-    # -----------------------------------------
     # 2. Integridad de fechas
-    # -----------------------------------------
-
     fechas_invalidas = conexion.execute(
         """
         SELECT COUNT(*)
@@ -76,10 +68,7 @@ def validar_modelo():
         """
     ).fetchone()[0]
 
-    # -----------------------------------------
     # 3. Integridad de productos
-    # -----------------------------------------
-
     productos_invalidos = conexion.execute(
         """
         SELECT COUNT(*)
@@ -90,10 +79,7 @@ def validar_modelo():
         """
     ).fetchone()[0]
 
-    # -----------------------------------------
     # 4. Integridad de clientes
-    # -----------------------------------------
-
     clientes_invalidos = conexion.execute(
         """
         SELECT COUNT(*)
@@ -122,9 +108,7 @@ def validar_modelo():
         clientes_invalidos
     )
 
-    # -----------------------------------------
     # 5. Reglas de calidad
-    # -----------------------------------------
 
     cantidades_invalidas = conexion.execute(
         """
@@ -182,10 +166,7 @@ def validar_modelo():
         totalventa_incorrecta
     )
 
-    # -----------------------------------------
     # 6. Total económico
-    # -----------------------------------------
-
     total_ventas = conexion.execute(
         """
         SELECT SUM(TotalVenta)

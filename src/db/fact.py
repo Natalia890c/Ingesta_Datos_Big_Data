@@ -24,9 +24,7 @@ def crear_fact_ventas():
 
     print("Creando FactVentas...")
 
-    # --------------------------------------------------
     # 1. Leer ventas limpias
-    # --------------------------------------------------
 
     ventas = pd.read_sql_query(
         """
@@ -44,18 +42,14 @@ def crear_fact_ventas():
 
     print("Ventas cargadas:", len(ventas))
 
-    # --------------------------------------------------
     # 2. Normalizar InvoiceDate
-    # --------------------------------------------------
 
     ventas["Fecha"] = pd.to_datetime(
         ventas["InvoiceDate"],
         errors="coerce"
     ).dt.strftime("%Y-%m-%d")
 
-    # --------------------------------------------------
     # 3. Obtener dimensiones
-    # --------------------------------------------------
 
     dim_fecha = pd.read_sql_query(
         """
@@ -87,9 +81,7 @@ def crear_fact_ventas():
         conexion
     )
 
-    # --------------------------------------------------
     # 4. Relacionar con DimFecha
-    # --------------------------------------------------
 
     ventas = ventas.merge(
         dim_fecha,
@@ -97,9 +89,7 @@ def crear_fact_ventas():
         how="inner"
     )
 
-    # --------------------------------------------------
     # 5. Relacionar con DimProducto
-    # --------------------------------------------------
 
     ventas = ventas.merge(
         dim_producto,
@@ -107,10 +97,8 @@ def crear_fact_ventas():
         how="inner"
     )
 
-    # --------------------------------------------------
     # 6. Relacionar con DimCliente
     #    LEFT JOIN porque CustomerID puede ser nulo
-    # --------------------------------------------------
 
     ventas = ventas.merge(
         dim_cliente,
@@ -118,18 +106,14 @@ def crear_fact_ventas():
         how="left"
     )
 
-    # --------------------------------------------------
     # 7. Calcular TotalVenta
-    # --------------------------------------------------
 
     ventas["TotalVenta"] = (
         ventas["Quantity"] *
         ventas["UnitPrice"]
     )
 
-    # --------------------------------------------------
     # 8. Seleccionar estructura final
-    # --------------------------------------------------
 
     fact = ventas[
         [
@@ -143,9 +127,7 @@ def crear_fact_ventas():
         ]
     ].copy()
 
-    # --------------------------------------------------
     # 9. Crear FactVentas
-    # --------------------------------------------------
 
     conexion.execute(
         "DROP TABLE IF EXISTS FactVentas"
@@ -160,9 +142,7 @@ def crear_fact_ventas():
 
     conexion.commit()
 
-    # --------------------------------------------------
     # 10. Validaciones
-    # --------------------------------------------------
 
     total_limpias = conexion.execute(
         """

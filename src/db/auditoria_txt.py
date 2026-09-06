@@ -2,11 +2,6 @@ import sqlite3
 import json
 from pathlib import Path
 
-
-# ========================================
-# RUTAS DEL PROYECTO
-# ========================================
-
 BASE_DIR = Path(__file__).resolve().parents[2]
 
 DB_PATH = BASE_DIR / "data" / "retail.db"
@@ -15,8 +10,6 @@ OUTPUT_PATH = BASE_DIR /"src" / "static" / "auditoria" / "ingestion.txt"
 
 
 def obtener_registros_extraidos():
-    """Obtiene el número de registros reportados durante la extracción."""
-
     with open(AUDITORIA_EXTRACCION, "r", encoding="utf-8") as archivo:
         auditoria = json.load(archivo)
 
@@ -24,8 +17,6 @@ def obtener_registros_extraidos():
 
 
 def obtener_registros_bd(conn, tabla):
-    """Obtiene el número de registros de una tabla SQLite."""
-
     query = f"SELECT COUNT(*) FROM {tabla}"
     resultado = conn.execute(query).fetchone()
 
@@ -33,9 +24,7 @@ def obtener_registros_bd(conn, tabla):
 
 
 def generar_auditoria():
-    print("========================================")
-    print("       AUDITORÍA FINAL DE INGESTA")
-    print("========================================")
+    print("    AUDITORÍA FINAL DE INGESTA")
 
     # Crear directorio de salida
     OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
@@ -79,9 +68,8 @@ def generar_auditoria():
 
         # Generar contenido del archivo
         contenido = f"""
-========================================
+        
 AUDITORÍA DE INGESTA DE DATOS
-========================================
 
 Fuente:
 Kaggle - Online Retail
@@ -93,9 +81,7 @@ Archivo de origen:
 OnlineRetail.csv
 
 
-----------------------------------------
 COMPARACIÓN API VS SQLITE
-----------------------------------------
 
 Registros extraídos desde el API:
 {registros_api}
@@ -110,9 +96,7 @@ Estado de la ingesta:
 {"OK" if ingesta_ok else "REVISAR"}
 
 
-----------------------------------------
 PROCESAMIENTO DE DATOS
-----------------------------------------
 
 Registros originales:
 {registros_staging}
@@ -124,9 +108,7 @@ Registros excluidos:
 {registros_staging - registros_limpios}
 
 
-----------------------------------------
 VALIDACIÓN FACTVENTAS
-----------------------------------------
 
 Registros válidos:
 {registros_limpios}
@@ -141,9 +123,7 @@ Estado:
 {"OK" if modelo_ok else "REVISAR"}
 
 
-----------------------------------------
 RESULTADO FINAL
-----------------------------------------
 
 Estado de la auditoría:
 {estado_final}
@@ -152,9 +132,7 @@ La comparación entre los registros extraídos
 y los registros almacenados en SQLite
 permite verificar la integridad de la ingesta.
 
-========================================
 FIN DE LA AUDITORÍA
-========================================
 """.strip()
 
         # Guardar archivo
@@ -183,4 +161,4 @@ FIN DE LA AUDITORÍA
 
 
 if __name__ == "__main__":
-    generar_auditoria()
+    generar_a
