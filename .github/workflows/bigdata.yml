@@ -1,0 +1,81 @@
+name: Big Data - Ingesta y Evidencias
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  ingestion:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Ejecutar ingesta desde API
+        run: python src/ingestion.py
+
+      - name: Cargar datos en SQLite
+        run: python src/db/database.py
+
+      - name: Ejecutar auditoría de calidad
+        run: python src/db/quality.py
+
+      - name: Validar reglas de limpieza
+        run: python src/db/validation.py
+
+      - name: Transformar datos
+        run: python src/db/transform.py
+
+      - name: Crear dimensiones
+        run: python src/db/dimensions.py
+
+      - name: Crear tabla de hechos
+        run: python src/db/fact.py
+
+      - name: Validar modelo estrella
+        run: python src/db/validation_final.py
+
+      - name: Crear índices
+        run: python src/db/indexes.py
+
+      - name: Generar muestra con Pandas
+        run: python src/db/muestra.py
+
+      - name: Generar auditoría TXT
+        run: python src/db/auditoria_txt.py
+
+      - name: Verificar evidencias
+        run: |
+          test -f data/retail.db
+          test -f data/muestra_ingestion.csv
+          test -f src/static/auditoria/ingestion.txt
+          test -f data/auditoria_extraccion.json
+          test -f data/auditoria_carga.json
+          test -f data/auditoria_calidad.json
+          test -f data/auditoria_final.json
+
+      - name: Publicar evidencias
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidencias-ingesta-big-data
+          path: |
+            data/retail.db
+            data/muestra_ingestion.csv
+            data/auditoria_extraccion.json
+            data/auditoria_carga.json
+            data/auditoria_calidad.json
+            data/auditoria_final.json
+            src/static/auditoria/ingestion.txt
