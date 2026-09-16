@@ -120,6 +120,7 @@ Dimensiones     FactVentas
              │
              ▼
      Base de datos SQLite
+```
 
 La base de datos analítica se genera en:
 
@@ -642,7 +643,7 @@ Ingesta_Datos_Big_Data/
 ├── README.md
 ├── requirements.txt
 └── setup.py
-
+```
 
 Nota: Los archivos OnlineRetail.csv y retail.db son archivos generados durante la ejecución y se encuentran excluidos del control de versiones mediante .gitignore. En GitHub Actions son reconstruidos durante el proceso automatizado.
 
