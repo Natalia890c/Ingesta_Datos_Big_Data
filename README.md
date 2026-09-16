@@ -81,7 +81,9 @@ Objetivo
 La primera etapa tiene como finalidad obtener los datos desde una fuente accesible mediante API, almacenarlos localmente, realizar controles de calidad, aplicar reglas de validación y construir una base de datos analítica utilizando SQLite.
 
 Arquitectura del proceso
+## Arquitectura del proceso
 
+```text
 API de Kaggle
      │
      ▼
@@ -111,11 +113,13 @@ Dimensiones     FactVentas
      Validación final
              │
              ▼
-        Evidencias
+         Evidencias
              │
              ▼
        GitHub Actions
-Base de datos SQLite
+             │
+             ▼
+     Base de datos SQLite
 
 La base de datos analítica se genera en:
 
@@ -594,6 +598,7 @@ Documenta el análisis de calidad, las reglas de limpieza aplicadas, las transfo
 
 Estructura del proyecto
 
+```text
 Ingesta_Datos_Big_Data/
 │
 ├── .github/
@@ -637,6 +642,7 @@ Ingesta_Datos_Big_Data/
 ├── README.md
 ├── requirements.txt
 └── setup.py
+
 
 Nota: Los archivos OnlineRetail.csv y retail.db son archivos generados durante la ejecución y se encuentran excluidos del control de versiones mediante .gitignore. En GitHub Actions son reconstruidos durante el proceso automatizado.
 
