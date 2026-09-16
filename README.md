@@ -1,48 +1,58 @@
-# Proyecto de Ingesta de Datos Big Data
+# Ingesta de Datos Big Data
 
 ## Descripción
 
-Este proyecto implementa la etapa de **ingestión de datos** de un proyecto de Big Data, utilizando Python, una fuente de datos accesible mediante API, SQLite como sistema de almacenamiento y GitHub Actions para automatizar la ejecución del proceso.
+Este proyecto implementa un proceso compuesto por dos etapas:
 
-La fuente utilizada corresponde al dataset **Online Retail**, obtenido mediante la API pública de Kaggle.
+- EA1 - Ingestión y construcción de una base de datos analítica.
+- EA2 - Preprocesamiento y limpieza de datos.
 
-El proceso permite:
+En el proyecto se usan herramientas como:
+- Python
+- Pandas
+- SQLite
+- Una fuente de datos accesible mediante API
+- GitHub Actions para automatizar la ejecución y generación de evidencias.
+
+La fuente utilizada corresponde al conjunto de datos **Online Retail**, obtenido mediante la API pública de Kaggle.
+
+El flujo completo permite:
 
 1. Obtener los datos desde la API.
 2. Almacenar el archivo fuente en formato CSV.
 3. Cargar los datos en una base de datos SQLite.
 4. Realizar controles de calidad.
-5. Aplicar reglas de validación y limpieza.
+5. Aplicar reglas de validación.
 6. Transformar los datos para su utilización analítica.
 7. Construir un modelo dimensional tipo estrella.
 8. Generar evidencias de auditoría.
-9. Generar una muestra de los datos mediante Pandas.
-10. Automatizar todo el proceso mediante GitHub Actions.
+9. Generar muestras de los datos mediante Pandas.
+10. Realizar el preprocesamiento y limpieza correspondiente a la EA2.
+11. Generar una muestra de los datos procesados.
+12. Generar un informe TXT de las operaciones de limpieza.
+13. Automatizar el proceso completo mediante GitHub Actions.
 
+---------------
 
+# Fuente de datos
 
-## Fuente de datos
-
-**Dataset:** Online Retail
+**Conjunto de datos:** Online Retail
 
 **Fuente:** Kaggle
 
 **API utilizada:**
 
-```text
 https://www.kaggle.com/api/v1/datasets/download/vijayuv/onlineretail
-```
 
-La descarga se realiza mediante una solicitud HTTP utilizando la biblioteca `requests`.
+La descarga se realiza mediante una solicitud HTTP utilizando la biblioteca requests.
 
-El dataset original contiene:
+El conjunto de datos original contiene:
 
-* **541.909 registros**
-* **8 columnas**
+541.909 registros
+8 columnas
 
-Columnas:
+Las columnas originales son:
 
-```text
 InvoiceNo
 StockCode
 Description
@@ -51,38 +61,36 @@ InvoiceDate
 UnitPrice
 CustomerID
 Country
-```
 
-La regla principal utilizada para identificar facturas canceladas es que el campo `InvoiceNo` comienza con la letra `C`.
+La regla principal utilizada para identificar facturas canceladas son que el campo InvoiceNo comienza con la letra C.
 
-
-
-## Tecnologías utilizadas
-
-* Python 3.12
-* Pandas
-* Requests
-* SQLite
-* Git
-* GitHub
-* GitHub Actions
+Tecnologías utilizadas
+Python 3.12
+Pandas
+Requests
+SQLite
+Git
+GitHub
+GitHub Actions
 
 SQLite no requiere una dependencia externa porque forma parte de la biblioteca estándar de Python.
 
+EA1 - Ingestión y construcción de la base analítica
+Objetivo
 
+La primera etapa tiene como finalidad obtener los datos desde una fuente accesible mediante API, almacenarlos localmente, realizar controles de calidad, aplicar reglas de validación y construir una base de datos analítica utilizando SQLite.
 
-## Arquitectura del proceso
-
-El flujo implementado es:
-
-```text
+Arquitectura del proceso
 API de Kaggle
      │
      ▼
 OnlineRetail.csv
      │
      ▼
-SQLite - stg_online_retail
+SQLite
+     │
+     ▼
+stg_online_retail
      │
      ▼
 Control de calidad
@@ -91,7 +99,7 @@ Control de calidad
 Validación de reglas
      │
      ▼
-ventas_limpias
+Transformación
      │
      ├──────────────┐
      ▼              ▼
@@ -99,107 +107,90 @@ Dimensiones     FactVentas
      │              │
      └───────┬──────┘
              ▼
-    Validación final
+     Validación final
              │
              ▼
-       Evidencias
+        Evidencias
              │
              ▼
-      GitHub Actions
-```
+       GitHub Actions
+Base de datos SQLite
 
+La base de datos analítica se genera en:
 
+data/retail.db
 
-## Modelo de datos
+La tabla de staging utilizada para conservar los registros originales es:
+
+stg_online_retail
+
+Esta tabla contiene:
+
+541.909 registros
+Modelo dimensional
 
 El proyecto utiliza un modelo dimensional tipo estrella.
 
-### Dimensiones
-
-#### DimFecha
+DimFecha
 
 Contiene la información correspondiente a las fechas de las ventas.
 
 Registros generados:
 
-```text
 305
-```
 
-Rango:
+Rango de fechas:
 
-```text
 2010-12-01 a 2011-12-09
-```
+DimCliente
 
-#### DimCliente
-
-Contiene los clientes identificados mediante `CustomerID`.
+Contiene los clientes identificados mediante CustomerID.
 
 Registros:
 
-```text
 4.338
-```
+DimProducto
 
-#### DimProducto
-
-Contiene los productos identificados mediante `StockCode`.
+Contiene los productos identificados mediante StockCode.
 
 Registros:
 
-```text
 3.922
-```
-
-### Tabla de hechos
-
-#### FactVentas
+FactVentas
 
 Contiene el detalle de las ventas válidas.
 
 Registros:
 
-```text
 530.104
-```
 
 La granularidad de la tabla corresponde a una línea de producto dentro de una transacción.
 
-El campo `TotalVenta` se calcula mediante:
+El campo TotalVenta se calcula mediante:
 
-```text
 TotalVenta = Quantity × UnitPrice
-```
+Reglas de limpieza de la EA1
 
+Antes de construir FactVentas se aplican las siguientes reglas:
 
-
-## Reglas de limpieza
-
-Antes de construir `FactVentas` se aplican las siguientes reglas:
-
-* La factura no debe estar cancelada.
-* `Quantity` debe ser mayor que cero.
-* `UnitPrice` debe ser mayor que cero.
+La factura no debe estar cancelada.
+Quantity debe ser mayor que cero.
+UnitPrice debe ser mayor que cero.
 
 Los registros que no cumplen estas reglas son excluidos de las ventas válidas.
 
 Resultados:
 
-```text
 Registros originales:          541.909
 Registros válidos:             530.104
 Registros excluidos:            11.805
-```
 
-Los registros sin `CustomerID` no son descartados, ya que la ausencia de cliente no impide considerar válida una venta.
+Los registros sin CustomerID no son descartados, ya que la ausencia de cliente no impide considerar válida una venta.
 
-
-## Resultados de calidad
+Resultados de calidad de la EA1
 
 La auditoría inicial identificó:
 
-```text
 Registros totales:              541.909
 CustomerID nulos:               135.080
 Description nulas:                1.454
@@ -207,166 +198,400 @@ Cantidad no positiva:            10.624
 Precio no positivo:               2.517
 Facturas canceladas:              9.288
 Grupos duplicados:                4.879
-```
 
 Estas categorías pueden presentar intersecciones; por lo tanto, sus valores no deben sumarse para calcular el total de registros inválidos.
 
-
-
-## Validación de la carga
+Validación de la carga
 
 La comparación entre la fuente y SQLite produjo:
 
-```text
 Registros API:                  541.909
 Registros SQLite:               541.909
 Diferencia:                           0
-```
 
 Resultado:
 
-```text
 APROBADO
-```
 
 La tabla de hechos también fue comparada con los registros válidos:
 
-```text
 Registros válidos:              530.104
 Registros FactVentas:           530.104
 Diferencia:                           0
-```
 
 Resultado:
 
-```text
 APROBADO
-```
-
-
-
-## Validación final del modelo
+Validación final del modelo
 
 La validación final produjo:
 
-```text
 stg_online_retail:               541.909
 ventas_limpias:                  530.104
 DimFecha:                            305
 DimCliente:                       4.338
 DimProducto:                      3.922
 FactVentas:                      530.104
-```
-
-Integridad referencial:
-
-```text
+Integridad referencial
 DateID inválido:                     0
 ProductoID inválido:                 0
 ClienteID inválido:                  0
-```
-
-Reglas de calidad después de la transformación:
-
-```text
+Reglas de calidad después de la transformación
 Cantidades <= 0:                    0
 Precios <= 0:                        0
 Facturas canceladas:                0
 TotalVenta incorrecto:              0
-```
 
 Valor total de ventas:
 
-```text
 10.666.684,54
-```
+EA2 - Preprocesamiento y limpieza de datos
+Objetivo
 
----
+La segunda etapa del proyecto utiliza como fuente la tabla stg_online_retail de la base de datos SQLite generada durante la EA1.
 
-## Evidencias generadas
+El objetivo es realizar:
 
-El proyecto genera diferentes archivos de evidencia.
+análisis exploratorio de calidad;
+identificación de duplicados;
+identificación de valores nulos;
+revisión de tipos de datos;
+validación de fechas;
+detección de valores no positivos;
+detección de valores atípicos;
+corrección de tipos;
+tratamiento de valores nulos;
+eliminación de duplicados;
+aplicación de reglas de limpieza;
+generación de nuevas variables;
+generación de evidencias.
 
-### Base de datos
+El procesamiento se implementa mediante Python y Pandas en:
 
-```text
+src/cleaning.py
+Fuente utilizada en la EA2
+
+La EA2 utiliza la tabla:
+
+stg_online_retail
+
+Esta tabla contiene los registros originales cargados durante la EA1.
+
+Registros procesados:
+
+541.909
+
+La utilización de stg_online_retail permite realizar el preprocesamiento sobre los datos antes de las transformaciones específicas utilizadas para construir el modelo dimensional.
+
+Análisis inicial de calidad de la EA2
+
+El análisis exploratorio inicial produjo los siguientes resultados:
+
+Registros iniciales:          541.909
+Duplicados exactos:              5.268
+CustomerID nulos:              135.080
+Description nulas:               1.454
+Quantity <= 0:                  10.624
+UnitPrice <= 0:                  2.517
+Fechas inválidas:                    0
+Tipos iniciales
+
+Los tipos identificados inicialmente fueron:
+
+InvoiceNo        str
+StockCode        str
+Description      str
+Quantity         int64
+InvoiceDate      str
+UnitPrice        float64
+CustomerID       float64
+Country          str
+Detección de valores atípicos
+
+Se utilizó el método del rango intercuartílico (IQR) para identificar posibles valores atípicos.
+
+Quantity
+Q1:                  1.0
+Q3:                 10.0
+IQR:                 9.0
+Límite inferior:   -12.5
+Límite superior:    23.5
+Outliers:           58.619
+UnitPrice
+Q1:                  1.25
+Q3:                  4.13
+IQR:                 2.88
+Límite inferior:    -3.07
+Límite superior:     8.45
+Outliers:           39.627
+
+Los valores identificados mediante IQR no fueron eliminados automáticamente.
+
+La detección de un valor atípico no implica necesariamente que el registro sea inválido desde el punto de vista del negocio. Por esta razón, los outliers fueron documentados y conservados cuando no incumplían las reglas de limpieza definidas.
+
+Reglas de limpieza de la EA2
+
+Se aplicaron las siguientes reglas:
+
+Eliminar registros duplicados exactos.
+Corregir los tipos de datos.
+Estandarizar campos de texto.
+Convertir InvoiceDate a formato de fecha y hora.
+Reemplazar valores nulos de Description por SIN DESCRIPCION.
+Mantener CustomerID como campo nullable cuando no existe información del cliente.
+Eliminar registros con Quantity <= 0.
+Eliminar registros con UnitPrice <= 0.
+Eliminar registros con fechas inválidas.
+Estandarizar el campo Country.
+Crear el campo calculado TotalVenta.
+Ordenar los registros por fecha, factura y producto.
+Tratamiento de valores nulos
+Description
+
+Los valores nulos de Description se reemplazan por:
+
+SIN DESCRIPCION
+
+De esta forma se conserva el registro sin eliminar la transacción debido únicamente a la ausencia de una descripción.
+
+CustomerID
+
+Los registros sin CustomerID se mantienen.
+
+El identificador del cliente se convierte a un tipo entero nullable para conservar correctamente los registros que no contienen información de cliente.
+
+Esto permite diferenciar entre:
+
+Cliente identificado
+
+y:
+
+Cliente no informado
+
+sin eliminar la transacción.
+
+Corrección de tipos
+
+Durante el proceso se realizan las siguientes conversiones:
+
+InvoiceDate → datetime
+CustomerID  → Int64 nullable
+Quantity    → Int64
+UnitPrice   → float
+
+Los campos de texto también son estandarizados mediante eliminación de espacios innecesarios.
+
+Intersección de reglas
+
+El análisis de intersecciones permitió identificar:
+
+Duplicados:                         5.268
+Duplicados + cantidad <= 0:            37
+Duplicados + precio <= 0:               5
+Cantidad <= 0 + precio <= 0:        1.336
+Cantidad <= 0 + canceladas:          9.288
+Precio <= 0 + canceladas:                 0
+Canceladas:                         9.288
+
+Los registros que incumplen al menos una regla de limpieza fueron:
+
+17.031
+
+Los registros que cumplen todas las reglas fueron:
+
+524.878
+
+Las categorías presentan intersecciones, por lo que no deben sumarse individualmente.
+
+Transformación adicional
+
+Se creó el campo:
+
+TotalVenta
+
+mediante la operación:
+
+TotalVenta = Quantity × UnitPrice
+
+Este campo permite representar el valor monetario correspondiente a cada línea de venta.
+
+Resultado final de la limpieza
+
+Después de aplicar las reglas de preprocesamiento:
+
+Registros iniciales:          541.909
+Registros finales:             524.878
+Registros eliminados:           17.031
+Reducción:                         3,14 %
+
+La reducción corresponde a los registros que incumplieron al menos una de las reglas de limpieza definidas.
+
+Evidencia de datos procesados
+
+La EA2 genera una muestra de 100 registros:
+
+src/xlsx/cleaned_data.csv
+
+El archivo contiene 9 columnas:
+
+InvoiceNo
+StockCode
+Description
+Quantity
+InvoiceDate
+UnitPrice
+CustomerID
+Country
+TotalVenta
+
+La muestra generada fue validada verificando:
+
+Registros:                    100
+Duplicados:                     0
+Quantity <= 0:                  0
+UnitPrice <= 0:                 0
+TotalVenta nulos:               0
+Auditoría de limpieza
+
+La auditoría de la EA2 se genera en:
+
+src/static/auditoria/cleaning_report.txt
+
+El informe documenta:
+
+cantidad de registros iniciales;
+duplicados identificados;
+valores nulos;
+tipos de datos;
+fechas inválidas;
+cantidades no positivas;
+precios no positivos;
+facturas canceladas;
+valores atípicos;
+reglas de limpieza;
+registros eliminados;
+registros finales;
+transformaciones realizadas;
+validaciones posteriores.
+Trazabilidad entre EA1 y EA2
+
+Las dos actividades permanecen integradas dentro del mismo proyecto.
+
+El flujo completo es:
+
+                         EA1
+                          │
+                          ▼
+                   API de Kaggle
+                          │
+                          ▼
+                  OnlineRetail.csv
+                          │
+                          ▼
+                       SQLite
+                          │
+                          ▼
+                  stg_online_retail
+                          │
+                          ▼
+                 Modelo analítico
+                          │
+                          ▼
+                    FactVentas
+                          │
+                          │
+                          ▼
+                         EA2
+                          │
+                          ▼
+                Análisis de calidad
+                          │
+                          ▼
+                Corrección de tipos
+                          │
+                          ▼
+                 Tratamiento nulos
+                          │
+                          ▼
+               Eliminación duplicados
+                          │
+                          ▼
+              Reglas de limpieza
+                          │
+                          ▼
+                  Transformaciones
+                          │
+                          ▼
+                cleaned_data.csv
+                          │
+                          ▼
+             cleaning_report.txt
+
+La EA2 complementa la EA1 y no reemplaza la implementación anterior.
+
+Evidencias generadas
+
+El proyecto genera archivos de evidencia correspondientes a las dos actividades.
+
+Evidencias EA1
+Base de datos
 data/retail.db
-```
 
-Contiene las tablas de staging, transformación, dimensiones y hechos.
+Contiene las tablas de puesta en escena, transformación, dimensiones y hechos.
 
-### Muestra con Pandas
-
-```text
+Muestra de ingestión
 data/muestra_ingestion.csv
-```
 
-La muestra contiene:
+Contiene una muestra de 100 registros generada mediante Pandas.
 
-```text
-100 registros
-8 columnas
-```
-
-Fue generada utilizando Pandas a partir de `FactVentas`.
-
-### Auditoría de extracción
-
-```text
+Auditoría de extracción
 data/auditoria_extraccion.json
-```
 
 Registra información sobre la fuente y los registros obtenidos.
 
-### Auditoría de carga
-
-```text
+Auditoría de carga
 data/auditoria_carga.json
-```
 
 Compara los registros del CSV con los registros almacenados en SQLite.
 
-### Auditoría de calidad
-
-```text
+Auditoría de calidad
 data/auditoria_calidad.json
-```
 
-Registra los resultados de los controles de calidad.
+Registra los resultados de los controles de calidad iniciales.
 
-### Auditoría final
-
-```text
+Auditoría final
 data/auditoria_final.json
-```
 
 Contiene la validación final del modelo analítico.
 
-### Auditoría TXT
-
-```text
+Auditoría TXT
 src/static/auditoria/ingestion.txt
-```
 
-Contiene la comparación entre los registros extraídos y almacenados:
+Contiene la comparación entre los registros extraídos y almacenados.
 
-```text
-API:       541.909
-SQLite:    541.909
-Diferencia:     0
+Resultado:
 
-Válidos:   530.104
-FactVentas:530.104
-Diferencia:     0
+API:        541.909
+SQLite:     541.909
+Diferencia:      0
+
+Válidos:    530.104
+FactVentas: 530.104
+Diferencia:      0
 
 Estado: APROBADO
-```
+Evidencias EA2
+Muestra limpia
+src/xlsx/cleaned_data.csv
 
----
+Contiene una muestra de los datos después del proceso de limpieza y transformación.
 
-## Estructura del proyecto
+Auditoría de limpieza
+src/static/auditoria/cleaning_report.txt
 
-```text
+Documenta el análisis de calidad, las reglas de limpieza aplicadas, las transformaciones y los resultados antes y después del procesamiento.
+
+Estructura del proyecto
 Ingesta_Datos_Big_Data/
 │
 ├── .github/
@@ -384,10 +609,15 @@ Ingesta_Datos_Big_Data/
 │
 ├── src/
 │   ├── ingestion.py
+│   ├── cleaning.py
 │   │
 │   ├── static/
 │   │   └── auditoria/
-│   │       └── ingestion.txt
+│   │       ├── ingestion.txt
+│   │       └── cleaning_report.txt
+│   │
+│   ├── xlsx/
+│   │   └── cleaned_data.csv
 │   │
 │   └── db/
 │       ├── database.py
@@ -405,58 +635,37 @@ Ingesta_Datos_Big_Data/
 ├── README.md
 ├── requirements.txt
 └── setup.py
-```
 
+Nota: Los archivos OnlineRetail.csv y retail.db son archivos generados durante la ejecución y se encuentran excluidos del control de versiones mediante .gitignore. En GitHub Actions son reconstruidos durante el proceso automatizado.
 
-
-## Instalación
-
-### 1. Clonar el repositorio
-
-```bash
-git clone URL_DEL_REPOSITORIO
-```
+Instalación
+1. Clonar el repositorio
+git clone https://github.com/Natalia890c/Ingesta_Datos_Big_Data.git
 
 Ingresar al proyecto:
 
-```bash
 cd Ingesta_Datos_Big_Data
-```
-
-### 2. Crear entorno virtual
+2. Crear entorno virtual
 
 En Windows:
 
-```powershell
 python -m venv .venv
-```
 
 Activar el entorno:
 
-```powershell
 .venv\Scripts\activate
-```
-
-### 3. Instalar dependencias
-
-```powershell
+3. Instalar dependencias
 pip install -r requirements.txt
-```
 
 Las dependencias principales son:
 
-```text
 pandas
 requests
-```
+Ejecución local
+EA1
 
+El proceso de ingestión y construcción de la base analítica puede ejecutarse mediante:
 
-
-## Ejecución local
-
-El proceso puede ejecutarse mediante los siguientes scripts:
-
-```powershell
 python src/ingestion.py
 python src/db/database.py
 python src/db/quality.py
@@ -468,38 +677,54 @@ python src/db/validation_final.py
 python src/db/indexes.py
 python src/db/muestra.py
 python src/db/auditoria_txt.py
-```
+EA2
 
-Al finalizar se generan la base SQLite, la muestra y las auditorías correspondientes.
+Después de disponer de la base de datos SQLite generada en la EA1, ejecutar:
 
+python src/cleaning.py
 
+El script:
 
-## Automatización con GitHub Actions
+Extrae los datos desde stg_online_retail.
+Analiza la calidad inicial.
+Corrige los tipos de datos.
+Aplica las reglas de limpieza.
+Realiza las transformaciones adicionales.
+Genera las evidencias de la EA2.
 
-El proyecto utiliza GitHub Actions para automatizar el proceso de ingestión.
+Los archivos generados son:
+
+src/xlsx/cleaned_data.csv
+src/static/auditoria/cleaning_report.txt
+Automatización con GitHub Actions
+
+El proyecto utiliza GitHub Actions para automatizar el proceso completo de las dos actividades.
 
 El workflow se encuentra en:
 
-```text
 .github/workflows/bigdata.yml
-```
 
-El workflow se ejecuta automáticamente cuando se realiza un `push` a la rama `main`.
+El nombre actual del workflow es:
 
-También puede ejecutarse manualmente mediante `workflow_dispatch`.
+Big Data - Ingesta, Preprocesamiento y Evidencias
 
-El flujo automatizado realiza:
+El flujo se ejecuta automáticamente cuando se realiza un push a la rama main.
 
-```text
+También puede ejecutarse manualmente mediante workflow_dispatch.
+
+Flujo automatizado
+
+El workflow realiza las siguientes etapas:
+
 Instalación de dependencias
         ↓
 Extracción desde API
         ↓
 Carga en SQLite
         ↓
-Control de calidad
+Control de calidad EA1
         ↓
-Validación
+Validación EA1
         ↓
 Transformación
         ↓
@@ -511,44 +736,56 @@ Validación final
         ↓
 Creación de índices
         ↓
-Generación de muestra
+Generación de muestra EA1
         ↓
-Generación de auditoría
+Generación de auditoría EA1
+        ↓
+Preprocesamiento y limpieza EA2
+        ↓
+Generación de cleaned_data.csv
+        ↓
+Generación de cleaning_report.txt
         ↓
 Verificación de evidencias
         ↓
-Publicación de artifacts
-```
+Publicación del artifact
 
-### Verificación de la ejecución
+Este flujo permite reconstruir la base de datos y ejecutar la EA2 desde un entorno limpio de GitHub Actions.
+
+Artifact generado
+
+El workflow publica las evidencias mediante GitHub Actions.
+
+El artifact generado actualmente es:
+
+evidencias-proyecto-big-data
+
+El artifact contiene evidencias correspondientes a ambas actividades:
+
+retail.db
+muestra_ingestion.csv
+auditoria_extraccion.json
+auditoria_carga.json
+auditoria_calidad.json
+auditoria_final.json
+src/static/auditoria/ingestion.txt
+src/xlsx/cleaned_data.csv
+src/static/auditoria/cleaning_report.txt
+Verificación de GitHub Actions
 
 Para comprobar una ejecución:
 
-1. Ingresar al repositorio en GitHub.
-2. Seleccionar la pestaña **Actions**.
-3. Seleccionar el workflow **Big Data - Ingesta y Evidencias**.
-4. Abrir la ejecución correspondiente.
-5. Revisar que todos los pasos finalicen correctamente.
-6. Consultar los artifacts generados al finalizar el workflow.
+Ingresar al repositorio en GitHub.
+Seleccionar la pestaña Actions.
+Seleccionar el workflow Big Data - Ingesta, Preprocesamiento y Evidencias.
+Abrir la ejecución correspondiente.
+Revisar que todos los pasos finalicen correctamente.
+Consultar el artifact generado al finalizar el flujo.
 
-Entre los artifacts se encuentran:
+La ejecución automatizada permite comprobar que las etapas de la EA1 y EA2 pueden ejecutarse de manera reproducible.
 
-```text
-retail.db
-muestra_ingestion.csv
-ingestion.txt
-auditorias JSON
-```
-
-
-
-## Resultado
-
-El proceso de ingestión fue implementado y validado utilizando una fuente accesible mediante API, almacenamiento en SQLite, procesamiento con Python y Pandas, generación de evidencias y automatización mediante GitHub Actions.
-
-La auditoría final confirma que:
-
-```text
+Resultados finales
+Resultados EA1
 Registros extraídos:             541.909
 Registros almacenados:            541.909
 Diferencia:                            0
@@ -558,4 +795,39 @@ Registros en FactVentas:         530.104
 Diferencia:                            0
 
 Estado final:                    APROBADO
-```
+Resultados EA2
+Registros iniciales:             541.909
+Registros finales:               524.878
+Registros eliminados:             17.031
+Reducción:                          3,14 %
+
+Evidencias generadas:
+
+src/xlsx/cleaned_data.csv
+src/static/auditoria/cleaning_report.txt
+Conclusión
+
+El proyecto implementa un flujo reproducible de procesamiento de datos que integra:
+
+ingestión mediante API;
+almacenamiento en SQLite;
+controles de calidad;
+validación de datos;
+transformación;
+modelado dimensional;
+generación de una tabla de hechos;
+preprocesamiento;
+tratamiento de valores nulos;
+eliminación de duplicados;
+corrección de tipos;
+detección de valores atípicos;
+generación de variables derivadas;
+generación de muestras;
+generación de auditorías;
+automatización mediante GitHub Actions.
+
+La arquitectura mantiene la continuidad entre la EA1 y la EA2 dentro del mismo repositorio.
+
+La EA2 utiliza los datos generados durante la EA1 y agrega una etapa específica de preprocesamiento y limpieza, junto con sus respectivas evidencias.
+
+De esta manera, el proyecto conserva la trazabilidad completa desde la fuente de datos hasta los resultados procesados y las evidencias generadas automáticamente.
