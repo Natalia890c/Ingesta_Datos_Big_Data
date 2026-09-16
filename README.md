@@ -81,6 +81,7 @@ Objetivo
 La primera etapa tiene como finalidad obtener los datos desde una fuente accesible mediante API, almacenarlos localmente, realizar controles de calidad, aplicar reglas de validación y construir una base de datos analítica utilizando SQLite.
 
 Arquitectura del proceso
+
 API de Kaggle
      │
      ▼
@@ -592,6 +593,7 @@ src/static/auditoria/cleaning_report.txt
 Documenta el análisis de calidad, las reglas de limpieza aplicadas, las transformaciones y los resultados antes y después del procesamiento.
 
 Estructura del proyecto
+
 Ingesta_Datos_Big_Data/
 │
 ├── .github/
