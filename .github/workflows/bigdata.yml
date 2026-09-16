@@ -1,4 +1,4 @@
-name: Big Data - Ingesta y Evidencias
+name: Big Data - Ingesta, Preprocesamiento y Evidencias
 
 on:
   push:
@@ -24,6 +24,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      # EA1- Ingesta y construcción de la base analítica
       - name: Ejecutar ingesta desde API
         run: python src/ingestion.py
 
@@ -57,8 +58,14 @@ jobs:
       - name: Generar auditoría TXT
         run: python src/db/auditoria_txt.py
 
+      # EA2 - Procesamiento y limpieza
+      - name: Ejecutar preprocesamiento y limpieza EA2
+        run: python src/cleaning.py
+
+      # Verificación de las evidencias
       - name: Verificar evidencias
         run: |
+          # Evidencias EA1
           test -f data/retail.db
           test -f data/muestra_ingestion.csv
           test -f src/static/auditoria/ingestion.txt
@@ -67,11 +74,17 @@ jobs:
           test -f data/auditoria_calidad.json
           test -f data/auditoria_final.json
 
+          # Evidencias EA2
+          test -f src/xlsx/cleaned_data.csv
+          test -f src/static/auditoria/cleaning_report.txt
+
+      # Publicación de las evidencias
       - name: Publicar evidencias
         uses: actions/upload-artifact@v4
         with:
-          name: evidencias-ingesta-big-data
+          name: evidencias-proyecto-big-data
           path: |
+            # EA1
             data/retail.db
             data/muestra_ingestion.csv
             data/auditoria_extraccion.json
@@ -79,3 +92,7 @@ jobs:
             data/auditoria_calidad.json
             data/auditoria_final.json
             src/static/auditoria/ingestion.txt
+
+            # EA2
+            src/xlsx/cleaned_data.csv
+            src/static/auditoria/cleaning_report.txt
